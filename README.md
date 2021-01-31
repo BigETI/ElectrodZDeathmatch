@@ -14,4 +14,4 @@ Please follow the following guide about GitHub Flow: https://guides.github.com/i
 
 ## License
 
-You can find the license for this project [here](https://github.com/BigETI/ElectrodZDeathmatch/blob/master/LICENSE): https://github.com/BigETI/ElectrodZDeathmatch/blob/master/LICENSE
+You can find the license for this project [here](https://github.com/BigETI/ElectrodZDeathmatch/blob/main/LICENSE): https://github.com/BigETI/ElectrodZDeathmatch/blob/main/LICENSE
