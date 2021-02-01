@@ -1,0 +1,5 @@
+{
+  "playerCharacterRespawnTime": 2.0,
+  "weaponPickupRespawnTime": 10.0,
+  "weaponPickupRadius": 2.0
+}

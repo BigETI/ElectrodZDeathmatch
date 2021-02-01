@@ -1,0 +1,12 @@
+[
+  {
+    "name": "Knife",
+    "damage": 12.5,
+    "usageCount": 0
+  },
+  {
+    "name": "StunBaton",
+    "damage": 25.0,
+    "usageCount": 4
+  }
+]
