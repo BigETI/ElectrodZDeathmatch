@@ -1,4 +1,5 @@
 ﻿using ElectrodZMultiplayer.Server;
+using System;
 using System.Collections.Generic;
 
 /// <summary>
@@ -22,17 +23,32 @@ namespace ElectrodZDeathmatch
         float Health { get; }
 
         /// <summary>
+        /// Maximal health
+        /// </summary>
+        float MaximalHealth { get; set; }
+
+        /// <summary>
         /// Is user alive
         /// </summary>
         bool IsAlive { get; }
 
         /// <summary>
-        /// This event will be invoked when a user took damage
+        /// Respawn time
+        /// </summary>
+        double RespawnTime { get; set; }
+
+        /// <summary>
+        /// This event will be invoked when this user has respawned
+        /// </summary>
+        event RespawnedDelegate OnRespawned;
+
+        /// <summary>
+        /// This event will be invoked when this user took damage
         /// </summary>
         event DamageTakenDelegate OnDamageTaken;
 
         /// <summary>
-        /// This event will be invoked when a user has died
+        /// This event will be invoked when this user has died
         /// </summary>
         event DiedDelegate OnDied;
 
@@ -40,7 +56,24 @@ namespace ElectrodZDeathmatch
         /// Applys damage to user
         /// </summary>
         /// <param name="damage">Damage</param>
+        void ApplyDamage(float damage);
+
+        /// <summary>
+        /// Applys damage to user
+        /// </summary>
+        /// <param name="damage">Damage</param>
         /// <param name="issuer">Issuer</param>
         void ApplyDamage(float damage, IGameEntity issuer);
+
+        /// <summary>
+        /// Heals user
+        /// </summary>
+        void Heal();
+
+        /// <summary>
+        /// Processes tick for user
+        /// </summary>
+        /// <param name="deltaTime">Delta time</param>
+        void ProcessTick(TimeSpan deltaTime);
     }
 }

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using ElectrodZMultiplayer;
+using Newtonsoft.Json;
 using System;
 using System.IO;
 
@@ -17,12 +18,12 @@ namespace ElectrodZDeathmatch
         /// <summary>
         /// Gets invoked when asset loading was successful
         /// </summary>
-        private AssetSuccessfullyLoadedDelegate<TData, TResult> onAssetSuccessfullyLoaded;
+        private readonly AssetSuccessfullyLoadedDelegate<TData, TResult> onAssetSuccessfullyLoaded;
 
         /// <summary>
         /// Gets invoked when asset loading has failed
         /// </summary>
-        private AssetLoadingFailedDelegate<TResult> onAssetLoadingFailed;
+        private readonly AssetLoadingFailedDelegate<TResult> onAssetLoadingFailed;
 
         /// <summary>
         /// Gets invoked when asset loading was successful
@@ -84,6 +85,10 @@ namespace ElectrodZDeathmatch
                             if (data == null)
                             {
                                 Console.Error.WriteLine($"Failed to parse asset from \"{ path }\".");
+                            }
+                            else if ((data is IValidable validable) && !validable.IsValid)
+                            {
+                                Console.Error.WriteLine($"Parsed asset is not valid.");
                             }
                             else
                             {

@@ -14,12 +14,12 @@ namespace ElectrodZDeathmatch
         /// <summary>
         /// Asset cache
         /// </summary>
-        private Dictionary<string, object> assetCache = new Dictionary<string, object>();
+        private readonly Dictionary<string, object> assetCache = new Dictionary<string, object>();
 
         /// <summary>
         /// Asset loaders
         /// </summary>
-        private Dictionary<string, IBaseAssetLoader> assetLoaders = new Dictionary<string, IBaseAssetLoader>();
+        private readonly Dictionary<string, IBaseAssetLoader> assetLoaders = new Dictionary<string, IBaseAssetLoader>();
 
         /// <summary>
         /// Get asset loader key

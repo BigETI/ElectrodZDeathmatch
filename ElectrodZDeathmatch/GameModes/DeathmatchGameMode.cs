@@ -20,6 +20,11 @@ namespace ElectrodZDeathmatch.GameModes
         private readonly Dictionary<string, IDeathmatchGameUser> deathmatchGameUsers = new Dictionary<string, IDeathmatchGameUser>();
 
         /// <summary>
+        /// Server lobby
+        /// </summary>
+        private IServerLobby serverLobby;
+
+        /// <summary>
         /// Weapon pickup
         /// </summary>
         private WeaponPickup[] weaponPickups = Array.Empty<WeaponPickup>();
@@ -30,14 +35,19 @@ namespace ElectrodZDeathmatch.GameModes
         private float weaponPickupRadiusSquared;
 
         /// <summary>
+        /// Remaining round time
+        /// </summary>
+        public double RemainingRoundTime { get; private set; } = 180.0;
+
+        /// <summary>
         /// Characters
         /// </summary>
         public ICharacters Characters { get; private set; }
 
         /// <summary>
-        /// Defaults
+        /// Rules
         /// </summary>
-        public IDefaults Defaults { get; private set; }
+        public IRules Rules { get; private set; }
 
         /// <summary>
         /// Player character spawn points
@@ -68,9 +78,10 @@ namespace ElectrodZDeathmatch.GameModes
         /// SPawns the specified user
         /// </summary>
         /// <param name="gameUser">Game user</param>
-        private void SpawnUser(IGameUser gameUser)
+        private void SpawnUser(IDeathmatchGameUser gameUser)
         {
             ISpawnPoint spawn_point = PlayerCharacterSpawnPoints.RandomSpawnPoint;
+            gameUser.Heal();
             gameUser.SetPosition(spawn_point.Position);
             gameUser.SetRotation(spawn_point.Rotation);
             gameUser.SetVelocity(Vector3.Zero);
@@ -84,10 +95,11 @@ namespace ElectrodZDeathmatch.GameModes
         /// <param name="serverLobby">Server lobby</param>
         public void OnInitialized(IGameResource gameResource, IServerLobby serverLobby)
         {
+            this.serverLobby = serverLobby;
             if (gameResource is IDeathmatchGameResource deathmatch_game_resource)
             {
                 Characters = deathmatch_game_resource.Assets.Get<string[], ICharacters>("./Assets/characters.json");
-                Defaults = deathmatch_game_resource.Assets.Get<DefaultsData, IDefaults>("./Assets/defaults.json");
+                Rules = deathmatch_game_resource.Assets.Get<RulesData, IRules>("./Assets/rules.json");
                 PlayerCharacterSpawnPoints = deathmatch_game_resource.Assets.Get<SpawnPointData[], ISpawnPoints>("./Assets/player-character-spawn-points.json");
                 WeaponSpawnPoints = deathmatch_game_resource.Assets.Get<SpawnPointData[], ISpawnPoints>("./Assets/weapon-spawn-points.json");
                 Weapons = deathmatch_game_resource.Assets.Get<WeaponData[], IWeapons>("./Assets/weapons.json");
@@ -96,7 +108,7 @@ namespace ElectrodZDeathmatch.GameModes
                     weaponPickups = new WeaponPickup[WeaponSpawnPoints.Count];
                     for (int index = 0; index < WeaponSpawnPoints.Count; index++)
                     {
-                        weaponPickups[index] = new WeaponPickup(Weapons.RandomWeapon, WeaponSpawnPoints[index], Defaults.WeaponPickupRespawnTime, serverLobby);
+                        weaponPickups[index] = new WeaponPickup(Weapons.RandomWeapon, WeaponSpawnPoints[index], Rules.WeaponPickupRespawnTime, serverLobby);
                     }
                 }
                 else
@@ -107,12 +119,13 @@ namespace ElectrodZDeathmatch.GameModes
             else
             {
                 Characters = new Characters();
-                Defaults = new Defaults();
+                Rules = new Rules();
                 PlayerCharacterSpawnPoints = new SpawnPoints();
                 WeaponSpawnPoints = new SpawnPoints();
                 Weapons = new Weapons();
             }
-            weaponPickupRadiusSquared = Defaults.WeaponPickupRadius * Defaults.WeaponPickupRadius;
+            RemainingRoundTime = Rules.RoundTime;
+            weaponPickupRadiusSquared = Rules.WeaponPickupRadius * Rules.WeaponPickupRadius;
             Console.WriteLine("=========================================================");
             Console.WriteLine("=                                                       =");
             Console.WriteLine("=                 ElectrodZ Deathmatch                  =");
@@ -136,6 +149,7 @@ namespace ElectrodZDeathmatch.GameModes
             {
                 weapon_pickup.Dispose();
             }
+            RemainingRoundTime = 0.0;
             weaponPickups = Array.Empty<WeaponPickup>();
             Console.WriteLine("=========================================================");
             Console.WriteLine("=                                                       =");
@@ -159,11 +173,14 @@ namespace ElectrodZDeathmatch.GameModes
         {
             if (gameUser is IDeathmatchGameUser deathmatch_game_user)
             {
+                deathmatch_game_user.OnRespawned += () => SpawnUser(deathmatch_game_user);
                 deathmatch_game_user.OnDied += (issuers) =>
                 {
-                    // TODO: Do something after a deathmatch game user dies
+                    deathmatch_game_user.SetPosition(Rules.OutOfMapPosition);
+                    deathmatch_game_user.RespawnTime = Rules.PlayerCharacterRespawnTime;
                 };
-                SpawnUser(gameUser);
+                deathmatch_game_user.MaximalHealth = Rules.PlayerCharacterHealth;
+                SpawnUser(deathmatch_game_user);
                 Console.WriteLine($"User \"{ deathmatch_game_user.Name }\" with GUID \"{ deathmatch_game_user.GUID }\" has joined the game.");
             }
             else
@@ -182,13 +199,19 @@ namespace ElectrodZDeathmatch.GameModes
         /// Game entity has been created
         /// </summary>
         /// <param name="gameEntity">Game entity</param>
-        public void OnGameEntityCreated(IGameEntity gameEntity) => Console.WriteLine($"Game entity with GUID \"{ gameEntity.GUID }\" has been created.");
+        public void OnGameEntityCreated(IGameEntity gameEntity)
+        {
+            // ...
+        }
 
         /// <summary>
         /// Game entity has been destroyed
         /// </summary>
         /// <param name="gameEntity">Game entity</param>
-        public void OnGameEntityDestroyed(IGameEntity gameEntity) => Console.WriteLine($"Game entity with GUID \"{ gameEntity.GUID }\" has been destroyed.");
+        public void OnGameEntityDestroyed(IGameEntity gameEntity)
+        {
+            // ...
+        }
 
         /// <summary>
         /// Game entity has been hit
@@ -202,34 +225,34 @@ namespace ElectrodZDeathmatch.GameModes
         /// <returns>"true" if game entity hit is valid, otherwise "false"</returns>
         public bool OnGameEntityHit(IGameEntity issuer, IGameEntity victim, string weaponName, Vector3 hitPosition, Vector3 hitForce, float damage)
         {
-            if (Weapons.TryGetWeaponByName(weaponName, out IWeapon weapon))
+            bool ret = false;
+            if ((victim is IDeathmatchGameUser victim_deathmatch_game_user) && victim_deathmatch_game_user.IsAlive && ((issuer == null) || ((issuer is IDeathmatchGameUser issuer_deathmatch_game_user) && issuer_deathmatch_game_user.IsAlive)))
             {
-                bool is_damage_too_high = weapon.Damage < damage;
-                if (issuer == null)
+                if (Weapons.TryGetWeaponByName(weaponName, out IWeapon weapon))
                 {
-                    Console.WriteLine($"Victim with GUID \"{ victim.GUID }\" has been hit with weapon \"{ weapon.Name }\". ");
-                }
-                else
-                {
-                    if (is_damage_too_high)
+                    if (weapon.Damage < damage)
                     {
-                        Console.Error.WriteLine($"Weapon \"{ weapon.Name }\" damage \"{ damage }\" by issuer with GUID \"{ issuer.GUID }\" is higher than defined \"{ weapon.Damage }\".");
+                        if (issuer == null)
+                        {
+                            Console.Error.WriteLine($"Weapon \"{ weapon.Name }\" damage \"{ damage }\" on victim with GUID \"{ victim_deathmatch_game_user.GUID }\" is higher than defined \"{ weapon.Damage }\".");
+                        }
+                        else
+                        {
+                            Console.Error.WriteLine($"Weapon \"{ weapon.Name }\" damage \"{ damage }\" on victim with GUID \"{ victim_deathmatch_game_user.GUID }\" by issuer with GUID \"{ issuer.GUID }\" is higher than defined \"{ weapon.Damage }\".");
+                        }
                     }
                     else
                     {
-                        if (victim is IDeathmatchGameUser victim_deathmatch_game_user)
-                        {
-                            victim_deathmatch_game_user.ApplyDamage(damage, issuer);
-                        }
-                        Console.WriteLine($"Victim with GUID \"{ victim.GUID }\" has been hit by entity with GUID \"{ issuer.GUID }\" with weapon \"{ weaponName }\". Damage: \"{ damage }\"; Hit point: \"{ hitPosition }\"; Hit force: \"{ hitForce }\".");
+                        victim_deathmatch_game_user.ApplyDamage(damage, issuer);
+                        ret = true;
                     }
                 }
+                else
+                {
+                    Console.Error.WriteLine($"Weapon \"{ weaponName }\" is not defined.");
+                }
             }
-            else
-            {
-                Console.Error.WriteLine($"Weapon \"{ weaponName }\" is not defined.");
-            }
-            return true;
+            return ret;
         }
 
         /// <summary>
@@ -238,20 +261,35 @@ namespace ElectrodZDeathmatch.GameModes
         /// <param name="deltaTime">Delta time</param>
         public void OnGameTicked(TimeSpan deltaTime)
         {
-            foreach (WeaponPickup weapon_pickup in weaponPickups)
+            if (RemainingRoundTime > float.Epsilon)
             {
-                weapon_pickup.Tick(deltaTime);
-                if (weapon_pickup.Entity != null)
+                RemainingRoundTime = Math.Max(RemainingRoundTime - deltaTime.TotalSeconds, 0.0);
+                foreach (WeaponPickup weapon_pickup in weaponPickups)
                 {
-                    foreach (IDeathmatchGameUser deathmatch_game_user in deathmatchGameUsers.Values)
+                    weapon_pickup.Tick(deltaTime);
+                    if (weapon_pickup.Entity != null)
                     {
-                        Vector3 delta = deathmatch_game_user.Position - weapon_pickup.Entity.Position;
-                        if (delta.MagnitudeSquared <= weaponPickupRadiusSquared)
+                        foreach (IDeathmatchGameUser deathmatch_game_user in deathmatchGameUsers.Values)
                         {
-                            // TODO: Give weapon
-                            weapon_pickup.Destroy();
+                            if (deathmatch_game_user.IsAlive)
+                            {
+                                Vector3 delta = deathmatch_game_user.Position - weapon_pickup.Entity.Position;
+                                if (delta.MagnitudeSquared <= weaponPickupRadiusSquared)
+                                {
+                                    // TODO: Give weapon
+                                    weapon_pickup.Destroy();
+                                }
+                            }
                         }
                     }
+                }
+                foreach (IDeathmatchGameUser deathmatch_game_user in deathmatchGameUsers.Values)
+                {
+                    deathmatch_game_user.ProcessTick(deltaTime);
+                }
+                if ((RemainingRoundTime <= 0.0) && (serverLobby != null))
+                {
+                    serverLobby.StopGameModeInstance();
                 }
             }
         }

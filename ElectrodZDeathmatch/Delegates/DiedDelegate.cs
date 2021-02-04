@@ -6,7 +6,7 @@
 namespace ElectrodZDeathmatch
 {
     /// <summary>
-    /// Used to signal when an user dies
+    /// Used to signal when an user has died
     /// </summary>
     /// <param name="issuers">Issuers</param>
     public delegate void DiedDelegate(IReadOnlyList<IDamageContributionResult> issuers);

@@ -15,7 +15,17 @@ namespace ElectrodZDeathmatch
         /// <summary>
         /// Damage contributions
         /// </summary>
-        private List<IDamageContribution> damageContributions = new List<IDamageContribution>();
+        private readonly List<IDamageContribution> damageContributions = new List<IDamageContribution>();
+
+        /// <summary>
+        /// Maximal health
+        /// </summary>
+        private float maximalHealth = 1.0f;
+
+        /// <summary>
+        /// Respawn time
+        /// </summary>
+        private double respawnTime;
 
         /// <summary>
         /// Damage contributions
@@ -25,7 +35,24 @@ namespace ElectrodZDeathmatch
         /// <summary>
         /// Health
         /// </summary>
-        public float Health { get; private set; } = 100.0f;
+        public float Health { get; private set; } = 1.0f;
+
+        /// <summary>
+        /// Maximal health
+        /// </summary>
+        public float MaximalHealth
+        {
+            get => maximalHealth;
+            set
+            {
+                if (value < 0.0f)
+                {
+                    throw new ArgumentException("Maximal health can't be negative.", nameof(value));
+                }
+                maximalHealth = value;
+                Health = Math.Min(Health, maximalHealth);
+            }
+        }
 
         /// <summary>
         /// Is user alive
@@ -33,12 +60,33 @@ namespace ElectrodZDeathmatch
         public bool IsAlive => Health > float.Epsilon;
 
         /// <summary>
-        /// This event will be invoked when a user took damage
+        /// Respawn time
+        /// </summary>
+        public double RespawnTime
+        {
+            get => respawnTime;
+            set
+            {
+                if (value < 0.0f)
+                {
+                    throw new ArgumentException("Respawn time can't be negative.", nameof(value));
+                }
+                respawnTime = value;
+            }
+        }
+
+        /// <summary>
+        /// This event will be invoked when this user has respawned
+        /// </summary>
+        public event RespawnedDelegate OnRespawned;
+
+        /// <summary>
+        /// This event will be invoked when this user took damage
         /// </summary>
         public event DamageTakenDelegate OnDamageTaken;
 
         /// <summary>
-        /// This event will be invoked when a user has died
+        /// This event will be invoked when this user has died
         /// </summary>
         public event DiedDelegate OnDied;
 
@@ -55,6 +103,12 @@ namespace ElectrodZDeathmatch
         /// Applys damage to user
         /// </summary>
         /// <param name="damage">Damage</param>
+        public void ApplyDamage(float damage) => ApplyDamage(damage, null);
+
+        /// <summary>
+        /// Applys damage to user
+        /// </summary>
+        /// <param name="damage">Damage</param>
         /// <param name="issuer">Issuer</param>
         public void ApplyDamage(float damage, IGameEntity issuer)
         {
@@ -62,17 +116,16 @@ namespace ElectrodZDeathmatch
             {
                 throw new ArgumentException("Damage contribution must be positive.", nameof(damage));
             }
-            if (issuer == null)
-            {
-                throw new ArgumentNullException(nameof(issuer));
-            }
-            if (!issuer.IsValid)
+            if ((issuer != null) && !issuer.IsValid)
             {
                 throw new ArgumentException("Issuer is not valid.", nameof(issuer));
             }
             if (IsAlive)
             {
-                damageContributions.Add(new DamageContribution(damage, issuer, DateTime.Now));
+                if (issuer != null)
+                {
+                    damageContributions.Add(new DamageContribution(damage, issuer, DateTime.Now));
+                }
                 Health = Math.Max(Health - damage, 0.0f);
                 OnDamageTaken?.Invoke(damage, issuer);
                 if (!IsAlive)
@@ -98,6 +151,28 @@ namespace ElectrodZDeathmatch
                     issuer_lookup.Clear();
                     issuers.Sort((left, right) => left.Damage.CompareTo(right.Damage));
                     OnDied?.Invoke(issuers);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Heals user
+        /// </summary>
+        public void Heal() => Health = maximalHealth;
+
+        /// <summary>
+        /// Processes tick for user
+        /// </summary>
+        /// <param name="deltaTime">Delta time</param>
+        public void ProcessTick(TimeSpan deltaTime)
+        {
+            if (RespawnTime > float.Epsilon)
+            {
+                RespawnTime -= deltaTime.TotalSeconds;
+                if (RespawnTime <= float.Epsilon)
+                {
+                    RespawnTime = 0.0;
+                    OnRespawned?.Invoke();
                 }
             }
         }
