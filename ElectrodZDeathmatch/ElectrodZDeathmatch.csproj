@@ -16,14 +16,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Static\" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <None Update="Assets\Deathmatch\rules.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Assets\Deathmatch\characters.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\Deathmatch\spawn-points.json">
+    <None Update="Assets\Deathmatch\weapon-spawn-points.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\Deathmatch\player-character-spawn-points.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Assets\Deathmatch\weapons.json">
