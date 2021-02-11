@@ -98,11 +98,11 @@ namespace ElectrodZDeathmatch.GameModes
             this.serverLobby = serverLobby;
             if (gameResource is IDeathmatchGameResource deathmatch_game_resource)
             {
-                Characters = deathmatch_game_resource.Assets.Get<string[], ICharacters>("./Assets/characters.json");
-                Rules = deathmatch_game_resource.Assets.Get<RulesData, IRules>("./Assets/rules.json");
-                PlayerCharacterSpawnPoints = deathmatch_game_resource.Assets.Get<SpawnPointData[], ISpawnPoints>("./Assets/player-character-spawn-points.json");
-                WeaponSpawnPoints = deathmatch_game_resource.Assets.Get<SpawnPointData[], ISpawnPoints>("./Assets/weapon-spawn-points.json");
-                Weapons = deathmatch_game_resource.Assets.Get<WeaponData[], IWeapons>("./Assets/weapons.json");
+                Characters = deathmatch_game_resource.Assets.Get<string[], ICharacters>("./Assets/Deathmatch/characters.json");
+                Rules = deathmatch_game_resource.Assets.Get<RulesData, IRules>("./Assets/Deathmatch/rules.json");
+                PlayerCharacterSpawnPoints = deathmatch_game_resource.Assets.Get<SpawnPointData[], ISpawnPoints>("./Assets/Deathmatch/player-character-spawn-points.json");
+                WeaponSpawnPoints = deathmatch_game_resource.Assets.Get<SpawnPointData[], ISpawnPoints>("./Assets/Deathmatch/weapon-spawn-points.json");
+                Weapons = deathmatch_game_resource.Assets.Get<WeaponData[], IWeapons>("./Assets/Deathmatch/weapons.json");
                 if (WeaponSpawnPoints.Count > 0)
                 {
                     weaponPickups = new WeaponPickup[WeaponSpawnPoints.Count];
@@ -173,6 +173,7 @@ namespace ElectrodZDeathmatch.GameModes
         {
             if (gameUser is IDeathmatchGameUser deathmatch_game_user)
             {
+                deathmatchGameUsers.Add(deathmatch_game_user.GUID.ToString(), deathmatch_game_user);
                 deathmatch_game_user.OnRespawned += () => SpawnUser(deathmatch_game_user);
                 deathmatch_game_user.OnDied += (issuers) =>
                 {
@@ -193,7 +194,11 @@ namespace ElectrodZDeathmatch.GameModes
         /// User has left the game
         /// </summary>
         /// <param name="gameUser">Game user</param>
-        public void OnUserLeft(IGameUser gameUser) => Console.WriteLine($"User \"{ gameUser.Name }\" with GUID \"{ gameUser.GUID }\" has left the game.");
+        public void OnUserLeft(IGameUser gameUser)
+        {
+            deathmatchGameUsers.Remove(gameUser.GUID.ToString());
+            Console.WriteLine($"User \"{ gameUser.Name }\" with GUID \"{ gameUser.GUID }\" has left the game.");
+        }
 
         /// <summary>
         /// Game entity has been created
