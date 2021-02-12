@@ -75,7 +75,7 @@ namespace ElectrodZDeathmatch.GameModes
         public IReadOnlyDictionary<string, object> Results { get; } = new Dictionary<string, object>();
 
         /// <summary>
-        /// SPawns the specified user
+        /// Spawns the specified user
         /// </summary>
         /// <param name="gameUser">Game user</param>
         private void SpawnUser(IDeathmatchGameUser gameUser)
