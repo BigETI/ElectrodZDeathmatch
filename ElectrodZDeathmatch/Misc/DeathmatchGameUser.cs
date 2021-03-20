@@ -139,11 +139,11 @@ namespace ElectrodZDeathmatch
                             string key = damage_contribution.Issuer.GUID.ToString();
                             if (issuer_lookup.ContainsKey(key))
                             {
-                                issuer_lookup.Add(key, new DamageContributionResult(damage_contribution.Damage, damage_contribution.Issuer));
+                                issuer_lookup[key] = new DamageContributionResult(issuer_lookup[key].Damage + damage_contribution.Damage, damage_contribution.Issuer);
                             }
                             else
                             {
-                                issuer_lookup[key] = new DamageContributionResult(issuer_lookup[key].Damage + damage_contribution.Damage, damage_contribution.Issuer);
+                                issuer_lookup.Add(key, new DamageContributionResult(damage_contribution.Damage, damage_contribution.Issuer));
                             }
                         }
                     }
@@ -168,10 +168,10 @@ namespace ElectrodZDeathmatch
         {
             if (RespawnTime > float.Epsilon)
             {
-                RespawnTime -= deltaTime.TotalSeconds;
-                if (RespawnTime <= float.Epsilon)
+                respawnTime -= deltaTime.TotalSeconds;
+                if (respawnTime <= float.Epsilon)
                 {
-                    RespawnTime = 0.0;
+                    respawnTime = 0.0;
                     OnRespawned?.Invoke();
                 }
             }
