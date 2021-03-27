@@ -1,7 +1,7 @@
 {
   "outOfMapPosition": {
     "x": 0.0,
-    "y": 0.0,
+    "y": 1000.0,
     "z": 0.0
   },
   "playerCharacterHealth": 1.0,
