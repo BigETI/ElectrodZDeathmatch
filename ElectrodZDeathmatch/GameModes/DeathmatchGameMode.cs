@@ -81,6 +81,7 @@ namespace ElectrodZDeathmatch.GameModes
         private void SpawnUser(IDeathmatchGameUser gameUser)
         {
             ISpawnPoint spawn_point = PlayerCharacterSpawnPoints.RandomSpawnPoint;
+            gameUser.SetSpectatingState(false);
             gameUser.Heal();
             gameUser.SetPosition(spawn_point.Position);
             gameUser.SetRotation(spawn_point.Rotation);
@@ -177,11 +178,12 @@ namespace ElectrodZDeathmatch.GameModes
                 deathmatch_game_user.OnRespawned += () => SpawnUser(deathmatch_game_user);
                 deathmatch_game_user.OnDied += (issuers) =>
                 {
+                    deathmatch_game_user.SetSpectatingState(true);
                     deathmatch_game_user.SetPosition(Rules.OutOfMapPosition);
+                    deathmatch_game_user.SetRotation(Rules.OutOfMapRotation);
                     deathmatch_game_user.RespawnTime = Rules.PlayerCharacterRespawnTime;
                 };
                 deathmatch_game_user.MaximalHealth = Rules.PlayerCharacterHealth;
-                deathmatch_game_user.OutOfMapPosition = Rules.OutOfMapPosition;
                 SpawnUser(deathmatch_game_user);
                 Console.WriteLine($"User \"{ deathmatch_game_user.Name }\" with GUID \"{ deathmatch_game_user.GUID }\" has joined the game.");
             }

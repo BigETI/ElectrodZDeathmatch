@@ -77,11 +77,6 @@ namespace ElectrodZDeathmatch
         }
 
         /// <summary>
-        /// Out of map position
-        /// </summary>
-        public Vector3 OutOfMapPosition { get; set; }
-
-        /// <summary>
         /// This event will be invoked when this user has respawned
         /// </summary>
         public event RespawnedDelegate OnRespawned;
@@ -179,10 +174,6 @@ namespace ElectrodZDeathmatch
                 {
                     respawnTime = 0.0;
                     OnRespawned?.Invoke();
-                }
-                else
-                {
-                    SetPosition(OutOfMapPosition);
                 }
             }
         }

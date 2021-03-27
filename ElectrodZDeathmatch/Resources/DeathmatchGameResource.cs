@@ -26,7 +26,7 @@ namespace ElectrodZDeathmatch.Resources
         public DeathmatchGameResource()
         {
             Assets.AddAssetLoader<string[], ICharacters>((data) => new Characters(data), () => new Characters());
-            Assets.AddAssetLoader<RulesData, IRules>((data) => new Rules(new Vector3(data.OutOfMapPosition.X, data.OutOfMapPosition.Y, data.OutOfMapPosition.Z), data.PlayerCharacterHealth, data.PlayerCharacterRespawnTime, data.RoundTime, data.WeaponPickupRadius, data.WeaponPickupRespawnTime), () => new Rules());
+            Assets.AddAssetLoader<RulesData, IRules>((data) => new Rules(new Vector3(data.OutOfMapPosition.X, data.OutOfMapPosition.Y, data.OutOfMapPosition.Z), new Quaternion(data.OutOfMapRotation.X, data.OutOfMapRotation.Y, data.OutOfMapRotation.Z, data.OutOfMapRotation.W), data.PlayerCharacterHealth, data.PlayerCharacterRespawnTime, data.RoundTime, data.WeaponPickupRadius, data.WeaponPickupRespawnTime), () => new Rules());
             Assets.AddAssetLoader<SpawnPointData[], ISpawnPoints>
             (
                 (data) =>
