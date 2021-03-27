@@ -1,4 +1,5 @@
-﻿using ElectrodZMultiplayer.Server;
+﻿using ElectrodZMultiplayer;
+using ElectrodZMultiplayer.Server;
 using System;
 using System.Collections.Generic;
 
@@ -74,6 +75,11 @@ namespace ElectrodZDeathmatch
                 respawnTime = value;
             }
         }
+
+        /// <summary>
+        /// Out of map position
+        /// </summary>
+        public Vector3 OutOfMapPosition { get; set; }
 
         /// <summary>
         /// This event will be invoked when this user has respawned
@@ -173,6 +179,10 @@ namespace ElectrodZDeathmatch
                 {
                     respawnTime = 0.0;
                     OnRespawned?.Invoke();
+                }
+                else
+                {
+                    SetPosition(OutOfMapPosition);
                 }
             }
         }

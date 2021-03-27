@@ -181,6 +181,7 @@ namespace ElectrodZDeathmatch.GameModes
                     deathmatch_game_user.RespawnTime = Rules.PlayerCharacterRespawnTime;
                 };
                 deathmatch_game_user.MaximalHealth = Rules.PlayerCharacterHealth;
+                deathmatch_game_user.OutOfMapPosition = Rules.OutOfMapPosition;
                 SpawnUser(deathmatch_game_user);
                 Console.WriteLine($"User \"{ deathmatch_game_user.Name }\" with GUID \"{ deathmatch_game_user.GUID }\" has joined the game.");
             }
