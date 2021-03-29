@@ -3,5 +3,10 @@
     "name": "Fist",
     "damage": 1.0,
     "usageCount": 0
+  },
+  {
+    "name": "Environment",
+    "damage": 1.0,
+    "usageCount": 0
   }
 ]
