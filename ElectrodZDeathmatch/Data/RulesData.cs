@@ -20,6 +20,12 @@ namespace ElectrodZDeathmatch.Data
         public Vector3FloatData OutOfMapPosition { get; set; }
 
         /// <summary>
+        /// Out of map rotation
+        /// </summary>
+        [JsonProperty("outOfMapRotation")]
+        public QuaternionFloatData OutOfMapRotation { get; set; }
+
+        /// <summary>
         /// Player character health
         /// </summary>
         [JsonProperty("playerCharacterHealth")]
@@ -54,6 +60,7 @@ namespace ElectrodZDeathmatch.Data
         /// </summary>
         public bool IsValid =>
             (OutOfMapPosition != null) &&
+            (OutOfMapRotation != null) &&
             (PlayerCharacterHealth >= 0.0f) &&
             (PlayerCharacterRespawnTime >= 0.0f) &&
             (RoundTime > float.Epsilon) &&

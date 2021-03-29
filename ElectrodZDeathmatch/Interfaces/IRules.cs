@@ -16,6 +16,11 @@ namespace ElectrodZDeathmatch
         Vector3 OutOfMapPosition { get; }
 
         /// <summary>
+        /// Out of map rotation
+        /// </summary>
+        Quaternion OutOfMapRotation { get; }
+
+        /// <summary>
         /// Player character health
         /// </summary>
         float PlayerCharacterHealth { get; }

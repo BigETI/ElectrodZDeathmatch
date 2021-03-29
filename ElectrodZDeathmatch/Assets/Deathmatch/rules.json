@@ -1,11 +1,17 @@
 {
   "outOfMapPosition": {
-    "x": 0.0,
-    "y": 1000.0,
-    "z": 0.0
+    "x": 17.94106,
+    "y": 57.39024,
+    "z": 36.82528
+  },
+  "outOfMapRotation": {
+    "x": -0.0250351317,
+    "y": 0.920336187,
+    "z": -0.0597289652,
+    "w": -0.385729253
   },
   "playerCharacterHealth": 1.0,
-  "playerCharacterRespawnTime": 2.0,
+  "playerCharacterRespawnTime": 5.0,
   "roundTime": 180.0,
   "weaponPickupRadius": 2.0,
   "weaponPickupRespawnTime": 10.0

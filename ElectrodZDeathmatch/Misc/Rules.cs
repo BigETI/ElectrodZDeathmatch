@@ -17,6 +17,11 @@ namespace ElectrodZDeathmatch
         public Vector3 OutOfMapPosition { get; }
 
         /// <summary>
+        /// Out of map rotation
+        /// </summary>
+        public Quaternion OutOfMapRotation { get; }
+
+        /// <summary>
         /// Player character health
         /// </summary>
         public float PlayerCharacterHealth { get; } = 1.0f;
@@ -63,11 +68,12 @@ namespace ElectrodZDeathmatch
         /// Constructs defaults
         /// </summary>
         /// <param name="outOfMapPosition">Out of map position</param>
+        /// <param name="outOfMapRotation">Out of map position</param>
         /// <param name="playerCharacterHealth">Player character health</param>
         /// <param name="playerCharacterRespawnTime">Player character respawn time</param>
         /// <param name="weaponPickupRadius">Weapon pickup radius</param>
         /// <param name="weaponPickupRespawnTime">Weapon pickup respawn time</param>
-        public Rules(Vector3 outOfMapPosition, float playerCharacterHealth, double playerCharacterRespawnTime, double roundTime, float weaponPickupRadius, double weaponPickupRespawnTime)
+        public Rules(Vector3 outOfMapPosition, Quaternion outOfMapRotation, float playerCharacterHealth, double playerCharacterRespawnTime, double roundTime, float weaponPickupRadius, double weaponPickupRespawnTime)
         {
             if (playerCharacterHealth < 0.0)
             {
@@ -90,6 +96,7 @@ namespace ElectrodZDeathmatch
                 throw new ArgumentException("Weapon pickup respawn time can't be negative.", nameof(weaponPickupRespawnTime));
             }
             OutOfMapPosition = outOfMapPosition;
+            OutOfMapRotation = outOfMapRotation;
             PlayerCharacterHealth = playerCharacterHealth;
             PlayerCharacterRespawnTime = playerCharacterRespawnTime;
             RoundTime = roundTime;

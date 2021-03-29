@@ -39,11 +39,6 @@ namespace ElectrodZDeathmatch
         double RespawnTime { get; set; }
 
         /// <summary>
-        /// Out of map position
-        /// </summary>
-        Vector3 OutOfMapPosition { get; set; }
-
-        /// <summary>
         /// This event will be invoked when this user has respawned
         /// </summary>
         event RespawnedDelegate OnRespawned;
