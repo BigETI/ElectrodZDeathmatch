@@ -1,17 +1,17 @@
 {
   "outOfMapPosition": {
-    "x": 9.888155,
-    "y": 60.46822,
-    "z": -39.39214
+    "x": 17.94106,
+    "y": 57.39024,
+    "z": 36.82528
   },
   "outOfMapRotation": {
-    "x": 0.213999972,
-    "y": -0.207695082,
-    "z": 0.0466218777,
-    "w": 0.953358889
+    "x": -0.0250351317,
+    "y": 0.920336187,
+    "z": -0.0597289652,
+    "w": -0.385729253
   },
   "playerCharacterHealth": 1.0,
-  "playerCharacterRespawnTime": 3.0,
+  "playerCharacterRespawnTime": 5.0,
   "roundTime": 180.0,
   "weaponPickupRadius": 2.0,
   "weaponPickupRespawnTime": 10.0
