@@ -80,13 +80,16 @@ namespace ElectrodZDeathmatch.GameModes
         /// <param name="gameUser">Game user</param>
         private void SpawnUser(IDeathmatchGameUser gameUser)
         {
-            ISpawnPoint spawn_point = PlayerCharacterSpawnPoints.RandomSpawnPoint;
-            gameUser.SetSpectatingState(false);
-            gameUser.Heal();
-            gameUser.SetPosition(spawn_point.Position);
-            gameUser.SetRotation(spawn_point.Rotation);
-            gameUser.SetVelocity(Vector3.Zero);
-            gameUser.SetAngularVelocity(Vector3.Zero);
+            ISpawnPoint spawn_point = PlayerCharacterSpawnPoints.NextSpawnPoint;
+            if (spawn_point != null)
+            {
+                gameUser.SetSpectatingState(false);
+                gameUser.Heal();
+                gameUser.SetPosition(spawn_point.Position);
+                gameUser.SetRotation(spawn_point.Rotation);
+                gameUser.SetVelocity(Vector3.Zero);
+                gameUser.SetAngularVelocity(Vector3.Zero);
+            }
         }
 
         /// <summary>

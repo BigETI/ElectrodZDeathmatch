@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 /// <summary>
 /// ElectrodZ deathmatch namespace
@@ -12,14 +11,26 @@ namespace ElectrodZDeathmatch
     public class SpawnPoints : List<ISpawnPoint>, ISpawnPoints
     {
         /// <summary>
-        /// Random number generator
+        /// Current spawn index
         /// </summary>
-        private Random random = new Random();
+        private uint currentSpawnIndex;
 
         /// <summary>
-        /// Random spawn point
+        /// Next spawn point
         /// </summary>
-        public ISpawnPoint RandomSpawnPoint => (Count > 0) ? this[random.Next(0, Count)] : SpawnPoint.Empty;
+        public ISpawnPoint NextSpawnPoint
+        {
+            get
+            {
+                ISpawnPoint ret = null;
+                if (Count > 0)
+                {
+                    currentSpawnIndex %= (uint)Count;
+                    ret = this[(int)currentSpawnIndex++];
+                }
+                return ret;
+            }
+        }
 
         /// <summary>
         /// Constructs spawn points

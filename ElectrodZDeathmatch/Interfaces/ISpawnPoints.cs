@@ -11,8 +11,8 @@ namespace ElectrodZDeathmatch
     public interface ISpawnPoints : IList<ISpawnPoint>
     {
         /// <summary>
-        /// Random spawn point
+        /// Next spawn point
         /// </summary>
-        ISpawnPoint RandomSpawnPoint { get; }
+        ISpawnPoint NextSpawnPoint { get; }
     }
 }
